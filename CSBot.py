@@ -7,15 +7,17 @@ import math
 import requests
 from dotenv import load_dotenv
 from datetime import timedelta
+from discord import activity
 from discord.ext import commands, tasks
 from discord_buttons_plugin import *
 from lib.functions import *
 from lib.handlejson import *
 from lib.achievements import *
 from lib.cards import *
-#from lib.keep_alive import keep_alive
+
 
 VERSION = "2.1.0.0"
+
 
 def check_for_updates():
   data = requests.get("https://api.github.com/repos/JoaoDoin/CSBot/releases").json()[0]
@@ -23,9 +25,27 @@ def check_for_updates():
   current_version = int(VERSION.replace(".", ""))
 
   if latest_version > current_version:
-    os.system("updater.exe")
+    ver, clog = data["tag_name"], data["body"]
+    print("Atualização disponível: v" + ver + "\n\nCHANGELOG:\n" + clog)
+
+    valid_choices = {
+      "yes": ["yes", "y", "sim", "s"],
+      "no": ["no", "não", "nao", "n"]
+    }
+
+    while True:
+      choice = input("\nAtualizar agora? (S/N)").lower()
+      if choice in valid_choices["yes"]:
+        os.system("updater.exe")
+        break
+      elif choice in valid_choices["no"]:
+        print("Atualização cancelada. Continuando...")
+        break
+      else:
+        print("Comando não reconhecido.")
 
 
+print("Iniciando CSBot v" + VERSION)
 check_for_updates()
 
 
@@ -87,7 +107,7 @@ async def auto_reset():
     running = True
   else:
     running = False
-
+  
   if running:
     timer -= 1
   else:
@@ -108,6 +128,7 @@ async def auto_reset():
 
 @client.event
 async def on_ready():
+  os.system("cls")
   print('Logged in as "{}"'.format(client.user))
   await client.change_presence(activity=discord.Game(name=cfg_activity, url="https://twitch.tv/imshockwav3"))
   await auto_register()
@@ -171,21 +192,7 @@ async def xingar_o_xhurru():
 
 @client.command()
 async def test(ctx):
-  with open("cfg/5v5.json", "r") as f:
-    i = json.load(f)
-  Team1 = client.get_channel(835664145755406367)
-  Team2 = client.get_channel(835664397560709141)
-  guild = await client.fetch_guild(cfg_guild)
-  members = guild.fetch_members(limit=None)
-
-  async for member in members:
-    try:
-      if str(member.id) in i["Team1"]:
-        await member.move_to(Team1)
-      elif str(member.id) in i["Team2"]:
-        await member.move_to(Team2)
-    except:
-      pass
+  pass
 
 
 @client.command(aliases=["timer", "autoreset"])
@@ -1131,6 +1138,5 @@ async def rrelp(ctx):
 
 
 
-#keep_alive()
 load_dotenv(".env")
 client.run(os.getenv('TOKEN'))
