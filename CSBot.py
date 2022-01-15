@@ -5,7 +5,6 @@ import random
 import asyncio
 import math
 import requests
-import urllib.request
 from dotenv import load_dotenv
 from datetime import timedelta
 from discord.ext import commands, tasks
@@ -16,12 +15,15 @@ from lib.achievements import *
 from lib.cards import *
 #from lib.keep_alive import keep_alive
 
-
-VERSION = "2.0.0.0"
+VERSION = "2.1.0.0"
 
 def check_for_updates():
+  data = requests.get("https://api.github.com/repos/JoaoDoin/CSBot/releases").json()[0]
+  latest_version = int(data["tag_name"].replace(".", ""))
   current_version = int(VERSION.replace(".", ""))
-  print(current_version + 1)
+
+  if latest_version > current_version:
+    os.system("updater.exe")
 
 
 check_for_updates()
