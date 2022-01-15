@@ -16,7 +16,7 @@ from lib.achievements import *
 from lib.cards import *
 
 
-VERSION = "2.1.0.0"
+VERSION = "2.2.0.0"
 
 
 def check_for_updates():
